@@ -1,120 +1,47 @@
-const noteForm = document.getElementById("note-form");
-const noteInput = document.getElementById("note-input");
-const notesList = document.getElementById("notes-list");
-const noteCount = document.getElementById("note-count");
+
+const noteText = document.getElementById("note-text");
 const charCount = document.getElementById("char-count");
-const warningMessage = document.getElementById("warning-message");
-const clearButton = document.getElementById("clear-btn");
-const themeButton = document.getElementById("theme-btn");
-
-let notes = JSON.parse(localStorage.getItem("quicknotes")) || [];
-
-function saveNotes() {
-  localStorage.setItem("quicknotes", JSON.stringify(notes));
-}
+const wordCount = document.getElementById("word-count");
+const themeToggle = document.getElementById("theme-toggle");
 
 function updateCounts() {
-  const characters = noteInput.value.length;
+  const text = noteText.value;
+  const characters = text.length;
+  const words = text.trim() === ""
+    ? 0
+    : text.trim().split(/\s+/).length;
 
-  charCount.textContent = `Characters: ${characters}`;
+  charCount.textContent = `${characters} / 200 characters`;
+  wordCount.textContent = `${words} ${words === 1 ? "word" : "words"}`;
+
+  charCount.classList.remove("warning", "over");
 
   if (characters > 200) {
-    warningMessage.textContent = "Your note is too long!";
-    warningMessage.classList.add("warning");
-  } else {
-    warningMessage.textContent = "";
-    warningMessage.classList.remove("warning");
+    charCount.classList.add("over");
+  } else if (characters > 180) {
+    charCount.classList.add("warning");
   }
-
-  noteCount.textContent = `You have ${notes.length} ${
-    notes.length === 1 ? "note" : "notes"
-  }.`;
 }
 
-function renderNotes() {
-  notesList.innerHTML = "";
-
-  notes.forEach((note) => {
-    const li = document.createElement("li");
-    li.className = "note";
-
-    const span = document.createElement("span");
-    span.textContent = note.text;
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.className = "delete-btn";
-    deleteButton.type = "button";
-
-    deleteButton.addEventListener("click", () => {
-      notes = notes.filter((item) => item.id !== note.id);
-      saveNotes();
-      renderNotes();
-      updateCounts();
-    });
-
-    li.appendChild(span);
-    li.appendChild(deleteButton);
-    notesList.appendChild(li);
-  });
-
+noteText.addEventListener("input", () => {
   updateCounts();
+  localStorage.setItem("writing-draft", noteText.value);
+});
+
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+
+  const theme = document.body.classList.contains("dark")
+    ? "dark"
+    : "light";
+
+  localStorage.setItem("writing-theme", theme);
+});
+
+noteText.value = localStorage.getItem("writing-draft") || "";
+
+if (localStorage.getItem("writing-theme") === "dark") {
+  document.body.classList.add("dark");
 }
 
-noteInput.addEventListener("input", () => {
-  updateCounts();
-  localStorage.setItem("quicknotes-draft", noteInput.value);
-});
-
-noteForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const text = noteInput.value.trim();
-
-  if (text.length < 1 || text.length > 200) return;
-
-  notes.push({
-    id: Date.now(),
-    text: text,
-  });
-
-  saveNotes();
-  noteInput.value = "";
-  localStorage.removeItem("quicknotes-draft");
-  renderNotes();
-});
-
-clearButton.addEventListener("click", () => {
-  noteInput.value = "";
-  notes = [];
-  saveNotes();
-  localStorage.removeItem("quicknotes-draft");
-  renderNotes();
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    noteInput.value = "";
-    notes = [];
-    saveNotes();
-    localStorage.removeItem("quicknotes-draft");
-    renderNotes();
-  }
-});
-
-themeButton.addEventListener("click", () => {
-  document.body.classList.toggle("dark-theme");
-
-  localStorage.setItem(
-    "quicknotes-theme",
-    document.body.classList.contains("dark-theme") ? "dark" : "light"
-  );
-});
-
-if (localStorage.getItem("quicknotes-theme") === "dark") {
-  document.body.classList.add("dark-theme");
-}
-
-noteInput.value = localStorage.getItem("quicknotes-draft") || "";
-
-renderNotes();
+updateCounts();
