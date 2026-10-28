@@ -1,0 +1,7 @@
+# Day 8 Reflection
+
+The most difficult concept in this course was understanding how a system can remain reliable when many users make requests at the same time. I initially found it challenging to understand why adding more application servers does not automatically prevent problems such as two customers buying the same seat. I overcame this by studying the difference between horizontal scaling, caching, and database transactions. Practicing multiple-choice questions also helped me understand when each concept is useful. I now understand that performance improvements and data correctness are separate concerns.
+
+The part of my capstone I would improve is its handling of errors and unusual situations. I would add clearer error messages, better loading states, and more tests for cases such as failed requests, repeated submissions, and unavailable resources. I would also test the application with more simultaneous users to identify performance bottlenecks before they affect real users. These improvements would make the application more reliable and easier to use.
+
+Next, I want to learn more about database transactions, indexing, and query optimization. I also want to practice load testing and monitoring so I can measure an application's performance instead of relying on assumptions. Finally, I plan to learn more about deploying applications to the cloud and using automated tests in a development workflow. My goal is to become confident in designing, building, and maintaining applications that are both scalable and reliable.
